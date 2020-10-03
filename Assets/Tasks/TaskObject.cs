@@ -11,8 +11,8 @@ public class TaskObject : MonoBehaviour
 	// The UI to open
 	public GameObject taskUI;
 
-	// The actual task to do
-	private TaskBase task;
+	// The actual tasks to do
+	public TaskBase task;
 
 	// Whether it is highlighted by the player
 	public bool highlighted;
@@ -49,11 +49,17 @@ public class TaskObject : MonoBehaviour
     {
 		// Check if the task should be completed
 		if (task.progress == task.MaxProgress && taskActivated)
-			task.End();
+		{
+			int performanceChange = task.End();
 
-		// Whether this task is available to do
-		bool taskAvailable = !_taskManager.IsTaskCompleted(task);
-		Debug.Log(taskAvailable);
+			_taskManager.CompleteTask(task);
+
+			// Update performance rating
+			FindObjectOfType<PerformanceTracker>().performanceRating += performanceChange;
+		}
+
+		// Whether this task is available to do (need to check if current task is valid first)
+		bool taskAvailable = _taskManager.IsTaskAvailable(task);
 
 		// Enable/disable highlight overlay
 		if (taskAvailable)
@@ -66,7 +72,7 @@ public class TaskObject : MonoBehaviour
 				taskActivated = !taskActivated;
 
 				// If we've just activated the task, call its begin method
-				if (taskActivated)
+				if (taskActivated && !task.inProgress)
 					task.Begin();
 			}
 		}
@@ -86,7 +92,7 @@ public class TaskObject : MonoBehaviour
 		taskUI.SetActive(taskActivated);
 	}
 
-	private void OnTriggerEnter2D(Collider2D collision)
+	private void OnTriggerStay2D(Collider2D collision)
 	{
 		if (collision.tag == "Player")
 		{

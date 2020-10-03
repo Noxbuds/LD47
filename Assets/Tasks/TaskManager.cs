@@ -17,6 +17,17 @@ public class TaskManager : MonoBehaviour
 	// Number of tasks to choose
 	public int numberOfTasks;
 
+	private TaskBase currentTask;
+
+	/// <summary>
+	/// Sets the task currently in progress
+	/// </summary>
+	/// <param name="task">The task to do</param>
+	public void SetCurrentTask(TaskBase task)
+	{
+		currentTask = task;
+	}
+
 	/// <summary>
 	/// Marks a task as completed
 	/// </summary>
@@ -27,7 +38,19 @@ public class TaskManager : MonoBehaviour
 		int id = tasksChosen.IndexOf(task);
 
 		if (id >= 0)
+		{
 			tasksCompleted[id] = true;
+			SetCurrentTask(null);
+		}
+	}
+
+	/// <summary>
+	/// Interrupts the player's current task
+	/// </summary>
+	public void InterruptCurrentTask()
+	{
+		if (currentTask != null)
+			currentTask.InterruptTask();
 	}
 
 	/// <summary>
@@ -35,15 +58,24 @@ public class TaskManager : MonoBehaviour
 	/// </summary>
 	/// <param name="task">The task to check</param>
 	/// <returns>Whether it has been completed</returns>
-	public bool IsTaskCompleted(TaskBase task)
+	public bool IsTaskAvailable(TaskBase task)
 	{
 		int id = tasksChosen.IndexOf(task);
 
 		if (id >= 0)
-			return tasksCompleted[id];
+		{
+			// First check if any other tasks at the specific station need to be completed first
+			for (int i = 0; i < id; i++)
+			{
+				if (tasksChosen[i].transform.parent == tasksChosen[id].transform.parent && !tasksCompleted[i])
+					return false;
+			}
+
+			return !tasksCompleted[id];
+		}
 		else
 			// Seems weird but this will disable any tasks that weren't chosen
-			return true;
+			return false;
 	}
 
 	// Start is called before the first frame update

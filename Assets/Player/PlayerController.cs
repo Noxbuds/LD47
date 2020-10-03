@@ -18,6 +18,9 @@ public class PlayerController : MonoBehaviour
 	// Whether the player can move
 	public bool canMove;
 
+	// The animator for the player
+	public Animator animator;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -41,5 +44,17 @@ public class PlayerController : MonoBehaviour
 			_rigidbody.velocity = new Vector2(moveX, moveY);
 		else
 			_rigidbody.velocity = Vector2.zero;
+
+		// Update animator
+		if (_rigidbody.velocity.sqrMagnitude > 0.01f)
+			animator.SetBool("IsRunning", true);
+		else
+			animator.SetBool("IsRunning", false);
+
+		// Flip if necessary
+		if (_rigidbody.velocity.x < 0.0)
+			animator.transform.localScale = new Vector3(-1, 1, 1);
+		if (_rigidbody.velocity.x > 0.0)
+			animator.transform.localScale = Vector3.one;
     }
 }

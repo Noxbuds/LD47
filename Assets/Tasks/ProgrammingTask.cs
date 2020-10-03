@@ -10,13 +10,9 @@ public class ProgrammingTask : TaskBase
 	// in a specific order. This will put code snippets on the screen.
 	// When the cat interrupts, it will erase some of your code
 
-	// Keys to press and their respective sprites
-	[Header("Keys")]
-	public KeyCode[] keys;
-	public Sprite[] keySprites;
-
 	// The 'next key' sprite
 	public Image nextKeyImage;
+	public Text nextKeyText;
 
 	// The key order and the correct and wrong code snippets that show for each
 	private int[] keyOrder;
@@ -51,7 +47,7 @@ public class ProgrammingTask : TaskBase
 	// Code snippet positioning
 	private static Vector2 codeStartPos = new Vector2(64, -2);
 	private static Vector2 codePosStep = new Vector2(0, -4); // The step to take for each new line of code
-	private static Vector2 keyIconStartPos = new Vector2(64 + 16, -2); // Where to start placing the key icons from
+	private static Vector2 keyIconStartPos = new Vector2(48, -2); // Where to start placing the key icons from
 
 	/// <summary>
 	/// Creates a random list of keys to press
@@ -63,7 +59,7 @@ public class ProgrammingTask : TaskBase
 		int[] newKeys = new int[length];
 
 		for (int i = 0; i < length; i++)
-			newKeys[i] = Random.Range(0, keys.Length);
+			newKeys[i] = Random.Range(0, keys.Count);
 
 		return newKeys;
 	}
@@ -166,6 +162,8 @@ public class ProgrammingTask : TaskBase
 
 	public override void Begin()
 	{
+		base.Begin();
+
 		// Pick the length and set the progress
 		int length = Random.Range(5, 9);
 		progress = 0;
@@ -181,7 +179,11 @@ public class ProgrammingTask : TaskBase
 		wrongSnippets = GetRandomSnippets(length);
 	}
 
-	
+	public override int End()
+	{
+		performanceRating = 10;
+		return base.End();
+	}
 
 	/// <summary>
 	/// Shows the next key to press next to the current line
@@ -197,10 +199,10 @@ public class ProgrammingTask : TaskBase
 
 				// Fetch the correct sprite
 				int keyId = keyOrder[cursor];
-				Sprite sprite = keySprites[keyId];
-
+				
 				// Set the sprite of the 'next key' image
-				nextKeyImage.sprite = sprite;
+				//nextKeyImage.sprite = sprite;
+				nextKeyText.text = keys[keyId].ToString();
 
 				// Place it correctly
 				nextKeyImage.transform.localPosition = new Vector2(keyIconStartPos.x, keyIconStartPos.y + codePosStep.y * cursor);
@@ -223,7 +225,7 @@ public class ProgrammingTask : TaskBase
     void Update()
     {
         // Check for any valid key presses
-		for (int i = 0; i < keys.Length; i++)
+		for (int i = 0; i < keys.Count; i++)
 		{
 			if (Input.GetKeyUp(keys[i]))
 				TypeKey(i);
