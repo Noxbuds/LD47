@@ -1,0 +1,41 @@
+Name:
+- Working From Home
+- Remote Worker
+- Programmer From Home
+
+Basic premise:
+You are a cat owner trying to go about your life and do your job
+from home. The cat will frequently get hungry or want a treat, and
+you must satisfy the cat or it will (run away/bring mice in - not
+sure yet). If you don't do your minimum tasks though, you get demoted
+or fired.
+
+Tasks:
+Short simple tasks that you must do, for example
+- Writing code:
+  - You must press C/V in the correct order some number of times to
+    write the code
+  - If you type a wrong character, you must press backspace and type
+    it again
+  - Hungry cats can type characters or press backspace
+- Attending a meeting:
+  - You must press A/B/C in the right order when a person asks you a
+    question
+  - Cat interruption will add extra characters that you must press
+    (ie apologising for/explaining cat)
+  - 
+  
+- Time passes faster while doing a task
+
+Cats:
+- Start off with 1, buy more as you get promoted and have more money
+- Cat gets hungry over the course of the day
+  - This makes them get more annoying
+  - They come to you when their hunger passes a threshold
+  - They'll interrupt you if they are hungry
+  - You mustn't overfeed your cat
+- Giving the cat treats can prolong their hunger without making them
+  sick/overfeeding them
+- Cat needs litter cleaning as well
+
+- Cat gets sick and must go to vet (LEAVE THIS FOR LAST)
