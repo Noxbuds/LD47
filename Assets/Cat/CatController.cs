@@ -36,6 +36,9 @@ public class CatController : MonoBehaviour
 	[Header("AI")]
 	public Vector2 moveSpeed;
 
+	[Header("Sound")]
+	public AudioSource[] meows;
+
 	[Header("UI")]
 	public GameObject hungerBar;
 	public float hungerBarSize;
@@ -49,6 +52,15 @@ public class CatController : MonoBehaviour
 
 		hungerBar.transform.localPosition = new Vector2(newX, 0);
 		hungerBar.transform.localScale = new Vector2(hungerPercent, 1);
+	}
+
+	private void Meow()
+	{
+		// Pick random meow and play it
+		int id = Random.Range(0, meows.Length);
+
+		if (id < meows.Length)
+			meows[id].Play();
 	}
 
 	private void ManageHunger()
@@ -72,6 +84,7 @@ public class CatController : MonoBehaviour
 			{
 				_taskManager.InterruptCurrentTask();
 				interruptTimer = interruptMaxTime;
+				Meow();
 			}
 		}
 	}
@@ -84,8 +97,10 @@ public class CatController : MonoBehaviour
 		{
 			Vector2 dirToPlayer = _player.transform.position - transform.position;
 
+			bool moving = _rigidbody.velocity.magnitude > 1f;
+
 			// Start moving
-			if (dirToPlayer.sqrMagnitude > 0.5)
+			if (dirToPlayer.sqrMagnitude > 3.5 && moving || dirToPlayer.sqrMagnitude > 4.5 && !moving)
 			{
 				dirToPlayer.Normalize();
 				_rigidbody.velocity = dirToPlayer * moveSpeed;
@@ -94,9 +109,16 @@ public class CatController : MonoBehaviour
 				_rigidbody.velocity = Vector2.zero;
 
 			// If moving, update animator
-			bool moving = _rigidbody.velocity.magnitude > 0.1f;
 			animator.SetBool("IsWalking", moving);
 		}
+	}
+
+	/// <summary>
+	/// Feeds the cat, removing its hunger
+	/// </summary>
+	public void Feed()
+	{
+		hunger = 0;
 	}
 
     // Start is called before the first frame update
@@ -125,8 +147,15 @@ public class CatController : MonoBehaviour
 
 		// Update sprite ordering
 		if (_player.transform.position.y > transform.position.y)
-			GetComponentInChildren<SpriteRenderer>().sortingOrder = 2;
+			GetComponentInChildren<SpriteRenderer>().sortingOrder = 3;
 		else
-			GetComponentInChildren<SpriteRenderer>().sortingOrder = 1;
+			GetComponentInChildren<SpriteRenderer>().sortingOrder = 2;
+	}
+
+	// Disable collision with player
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.tag == "Player")
+			Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
 	}
 }

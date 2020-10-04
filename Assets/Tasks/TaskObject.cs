@@ -52,7 +52,7 @@ public class TaskObject : MonoBehaviour
 		{
 			int performanceChange = task.End();
 
-			_taskManager.CompleteTask(task);
+			_taskManager.CompleteTask();
 
 			// Update performance rating
 			FindObjectOfType<PerformanceTracker>().performanceRating += performanceChange;
@@ -70,6 +70,9 @@ public class TaskObject : MonoBehaviour
 			{
 				// Swap state of 'task activated'
 				taskActivated = !taskActivated;
+
+				// Set pause status
+				task.SetPaused(!taskActivated);
 
 				// If we've just activated the task, call its begin method
 				if (taskActivated && !task.inProgress)

@@ -130,7 +130,7 @@ public class MeetingTask : TaskBase
     // Update is called once per frame
     void Update()
     {
-        if (inProgress)
+        if (inProgress && !paused)
 		{
 			HandleTimers();
 
@@ -140,4 +140,9 @@ public class MeetingTask : TaskBase
 				HandleQuestion();
 		}
     }
+
+	public override string ToString()
+	{
+		return "Work Meeting";
+	}
 }

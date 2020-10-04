@@ -29,6 +29,17 @@ public class TaskBase : MonoBehaviour
 	private static KeyCode[] allKeys = { KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, /*KeyCode.E,*/ KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,
 		KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R, KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, KeyCode.Y, KeyCode.Z };
 
+	
+	public bool paused;
+	/// <summary>
+	/// Pauses/unpauses this task
+	/// </summary>
+	/// <param name="paused">Whether the task is paused</param>
+	public void SetPaused(bool paused)
+	{
+		this.paused = paused;
+	}
+
 	/// <summary>
 	/// Begins the task
 	/// </summary>
@@ -38,7 +49,7 @@ public class TaskBase : MonoBehaviour
 		performanceRating = 0;
 
 		// Set the current task
-		FindObjectOfType<TaskManager>().SetCurrentTask(this);
+		//FindObjectOfType<TaskManager>().SetCurrentTask(this);
 
 		// Choose the keys
 		keys = new List<KeyCode>();
@@ -85,4 +96,15 @@ public class TaskBase : MonoBehaviour
     {
         
     }
+
+	// Tasks are equal if their sub type is the same
+	public override bool Equals(object other)
+	{
+		return other.GetType() == this.GetType();
+	}
+
+	public override string ToString()
+	{
+		return "Empty Task";
+	}
 }

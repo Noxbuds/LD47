@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Manages all the tasks the player has to complete
@@ -12,36 +13,21 @@ public class TaskManager : MonoBehaviour
 
 	// Tasks that were chosen for today
 	private List<TaskBase> tasksChosen;
-	private List<bool> tasksCompleted;
 
 	// Number of tasks to choose
 	public int numberOfTasks;
 
 	private TaskBase currentTask;
 
-	/// <summary>
-	/// Sets the task currently in progress
-	/// </summary>
-	/// <param name="task">The task to do</param>
-	public void SetCurrentTask(TaskBase task)
-	{
-		currentTask = task;
-	}
+	// Task list display
+	public Text taskListDisplay;
 
 	/// <summary>
-	/// Marks a task as completed
+	/// Marks the current task as completed
 	/// </summary>
-	/// <param name="task">The task to complete</param>
-	public void CompleteTask(TaskBase task)
+	public void CompleteTask()
 	{
-		// Find its ID in the tasks chosen list and set the flag in 'tasks completed'
-		int id = tasksChosen.IndexOf(task);
-
-		if (id >= 0)
-		{
-			tasksCompleted[id] = true;
-			SetCurrentTask(null);
-		}
+		tasksChosen.RemoveAt(0);
 	}
 
 	/// <summary>
@@ -54,28 +40,56 @@ public class TaskManager : MonoBehaviour
 	}
 
 	/// <summary>
-	/// Checks whether a specific task has been completed yet
+	/// Checks whether a task is available to do
 	/// </summary>
 	/// <param name="task">The task to check</param>
 	/// <returns>Whether it has been completed</returns>
 	public bool IsTaskAvailable(TaskBase task)
 	{
-		int id = tasksChosen.IndexOf(task);
+		return currentTask.GetType() == task.GetType();
+
+		/*int id = tasksChosen.IndexOf(task);
 
 		if (id >= 0)
 		{
 			// First check if any other tasks at the specific station need to be completed first
 			for (int i = 0; i < id; i++)
 			{
-				if (tasksChosen[i].transform.parent == tasksChosen[id].transform.parent && !tasksCompleted[i])
+				if (tasksChosen[i].transform.parent == tasksChosen[id].transform.parent && tasksCompleted[i] < taskCount[i])
 					return false;
 			}
 
-			return !tasksCompleted[id];
+			return tasksCompleted[id] < taskCount[id];
 		}
 		else
 			// Seems weird but this will disable any tasks that weren't chosen
-			return false;
+			return false;*/
+	}
+
+	private void UpdateTaskList()
+	{
+
+		// Set up a dictionary for each count
+		Dictionary<TaskBase, int> taskCounts = new Dictionary<TaskBase, int>();
+
+		foreach (TaskBase task in tasksChosen)
+		{
+			// Add this count
+			if (taskCounts.ContainsKey(task))
+				taskCounts[task] += 1;
+			else
+				taskCounts.Add(task, 1);
+		}
+
+		// Loop through dictionary and add to the written list
+		taskListDisplay.text = "Work to do:";
+		foreach (KeyValuePair<TaskBase, int> task in taskCounts)
+		{
+			taskListDisplay.text += "\n" + task.Key.ToString();
+
+			if (task.Value > 1)
+				taskListDisplay.text += " x" + task.Value.ToString();
+		}
 	}
 
 	// Start is called before the first frame update
@@ -83,22 +97,23 @@ public class TaskManager : MonoBehaviour
     {
 		// Pick the tasks for the day
 		tasksChosen = new List<TaskBase>();
-		tasksCompleted = new List<bool>();
 
 		for (int i = 0; i < numberOfTasks; i++)
 		{
 			// Pick next task in list for now
-			//TODO: implement possibility for random tasks with varying counts
-			TaskBase nextTask = possibleTasks[i];
+			int taskId = Random.Range(0, possibleTasks.Length);
+			TaskBase nextTask = possibleTasks[taskId];
 
 			tasksChosen.Add(nextTask);
-			tasksCompleted.Add(false);
 		}
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+		if (tasksChosen.Count > 0)
+			currentTask = tasksChosen[0];
+
+		UpdateTaskList();
     }
 }

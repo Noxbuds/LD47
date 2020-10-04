@@ -185,6 +185,12 @@ public class ProgrammingTask : TaskBase
 		return base.End();
 	}
 
+	public override void InterruptTask()
+	{
+		// Remove characters each time
+		DeletePreviousLine();
+	}
+
 	/// <summary>
 	/// Shows the next key to press next to the current line
 	/// </summary>
@@ -263,5 +269,10 @@ public class ProgrammingTask : TaskBase
 		}
 
 		ShowNextKey();
+	}
+
+	public override string ToString()
+	{
+		return "Write Code";
 	}
 }
