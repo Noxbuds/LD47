@@ -114,6 +114,12 @@ public class ProgrammingTask : TaskBase
 		{
 			if (cursor < keyOrder.Length)
 			{
+				// Pick random sound
+				int id = Random.Range(0, keySounds.Length);
+
+				if (id < keySounds.Length)
+					keySounds[id].Play();
+
 				// Fetch the correct and incorrect code snippets here
 				GameObject correct = codeSnippets[correctSnippets[cursor]];
 				GameObject incorrect = codeSnippets[wrongSnippets[cursor]];

@@ -89,6 +89,12 @@ public class EmailTask : TaskBase
 		{
 			if (cursorIndex < keyOrder.Length)
 			{
+				// Pick random sound
+				int id = Random.Range(0, keySounds.Length);
+
+				if (id < keySounds.Length)
+					keySounds[id].Play();
+
 				// Fetch correct and incorrect snippets to place
 				GameObject correct = textSnippets[keyOrder[cursorIndex]];
 				GameObject incorrect = textSnippets[Random.Range(0, textSnippets.Length)];

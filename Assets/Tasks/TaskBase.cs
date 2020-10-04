@@ -28,6 +28,8 @@ public class TaskBase : MonoBehaviour
 	public List<KeyCode> keys; // the keys chosen
 	public Sprite keySprite;
 
+	public AudioSource[] keySounds;
+
 	public int numberOfKeys; // How many keys to choose
 
 	private static KeyCode[] allKeys = { KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, /*KeyCode.E,*/ KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,

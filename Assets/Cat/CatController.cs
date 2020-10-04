@@ -112,7 +112,7 @@ public class CatController : MonoBehaviour
 		{
 			Vector2 dirToPlayer = _player.transform.position - transform.position;
 
-			bool moving = _rigidbody.velocity.magnitude > 1f;
+			bool moving = _rigidbody.velocity.magnitude > 0.2f;
 
 			// Start moving
 			if (dirToPlayer.sqrMagnitude > 3.5 && moving || dirToPlayer.sqrMagnitude > 4.5 && !moving)
