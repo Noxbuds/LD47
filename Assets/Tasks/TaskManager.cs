@@ -118,6 +118,9 @@ public class TaskManager : MonoBehaviour
 	// Ends the day when the time is up
 	public void EndDay()
 	{
+		// Just to make sure we won't get main menu screen
+		PlayerData.OnMainMenu = false;
+
 		// If the player successfully completed the level (ie there are no more tasks),
 		// set level to level + 1. Otherwise reset to zero
 		if (tasksChosen.Count > 0)

@@ -19,13 +19,12 @@ public class MeetingTask : TaskBase
 
 	// Overlays for each speaker
 	public GameObject[] speakerOverlays;
+	public GameObject playerSpeakingOverlay;
 
-	// Timer for the player to answer a question
-	private float questionAnswerTimer;
-	public float timeToAnswerQuestion;
+	// Time to interrupt meeting for
+	private float interruptTimer;
 	
-	private int[] question; // The keys the player must press to answer the question
-	private int questionStep; // The current step in the question
+	private List<int> question; // The keys the player must press to answer the question
 
 	// Next key text
 	public GameObject nextKeySprite;
@@ -35,31 +34,27 @@ public class MeetingTask : TaskBase
 	{
 		base.Begin();
 
-		questionStep = 1;
-
-		// Reset speaker timers
-		speakerTimer = Random.Range(minSpeakDelay, maxSpeakDelay);
+		question = new List<int>();
 
 		// Set a meeting time
 		MaxProgress = Random.Range(minMeetingQuestions, maxMeetingQuestions);
 		progress = 0;
-
-		// The next person to ask a question
-		speaker = 0;
+		
+		SelectNewSpeaker();
 	}
 
 	/// <summary>
 	/// Generates a question
 	/// </summary>
 	/// <returns></returns>
-	private int[] GenerateQuestion(int difficulty)
+	private List<int> GenerateQuestion(int difficulty)
 	{
-		int[] newQuestion = new int[difficulty];
+		List<int> newQuestion = new List<int>();
 
 		// Generate a random sequence
 		for (int i = 0; i < difficulty; i++)
 		{
-			newQuestion[i] = Random.Range(0, numberOfKeys);
+			newQuestion.Add(Random.Range(0, numberOfKeys));
 		}
 
 		return newQuestion;
@@ -67,58 +62,92 @@ public class MeetingTask : TaskBase
 
 	private void HandleTimers()
 	{
-		questionAnswerTimer -= Time.deltaTime;
+		interruptTimer -= Time.deltaTime;
 
-		speakerTimer -= Time.deltaTime;
-
-		// If the time is up or the player is 'speaking', stop the AI speaker
-		if (speakerTimer < 0 || questionAnswerTimer > 0)
-			speakerOverlays[speaker].SetActive(false);
-		else
-			speakerOverlays[speaker].SetActive(true);
-
-		// If the speaking time is up, ask a new question
-		if (speakerTimer < 0 && questionStep > 0)
+		// Don't advance timers while there is a question
+		if (question.Count == 0 && interruptTimer < 0)
 		{
-			questionAnswerTimer = timeToAnswerQuestion;
-			question = GenerateQuestion(3);
-			questionStep = 0;
+			speakerTimer -= Time.deltaTime;
 
-			speakerTimer = questionAnswerTimer + Random.Range(minSpeakDelay, maxSpeakDelay);
+			// If the time is up or the player is 'speaking', stop the AI speaker
+			if (speakerTimer < 0 || question.Count > 0)
+				speakerOverlays[speaker].SetActive(false);
+			else
+				speakerOverlays[speaker].SetActive(true);
+
+			// If the speaking time is up, ask a new question
+			if (speakerTimer < 0)
+			{
+				question = GenerateQuestion(3);
+
+				speakerTimer = Random.Range(minSpeakDelay, maxSpeakDelay);
+			}
 		}
+	}
+
+	private void SelectNewSpeaker()
+	{
+		// Hide current speaker
+		speakerOverlays[speaker].SetActive(false);
+
+		// Pick a new speaker for next question
+		speaker++;
+		speaker = speaker % speakerOverlays.Length;
+		speakerTimer = Random.Range(minSpeakDelay, maxSpeakDelay);
 	}
 
 	private void HandleQuestion()
 	{
 		// If we have reached the last step of the question, add to progress
-		if (questionStep >= question.Length)
+		if (question.Count == 0)
 		{
-			progress += 1;
 			nextKeySprite.SetActive(false);
-			questionAnswerTimer = -1;
-
-			// Pick a new speaker for next question
-			speaker++;
-			speakerTimer = Random.Range(minSpeakDelay, maxSpeakDelay);
 		}
 		else
 		{
 			// Show the next key to press
 			nextKeySprite.SetActive(true);
-			nextKeyText.text = keys[question[questionStep]].ToString();
+			nextKeyText.text = keys[question[0]].ToString();
 
 			// Check key press
 			for (int i = 0; i < keys.Count; i++)
 			{
 				if (Input.GetKeyDown(keys[i]))
 				{
-					if (i == question[questionStep])
+					if (i == question[0])
+					{
 						performanceRating += 1;
 
-					questionStep++;
+						// Remove the key if it was correct
+						question.RemoveAt(0);
+
+						// If there are no more questions, increase progress
+						if (question.Count == 0)
+						{
+							progress++;
+							SelectNewSpeaker();
+						}
+					}
+					else
+					{
+						// Re-generate and make it longer as if to correct yourself
+						question = GenerateQuestion(question.Count + 1);
+					}
 				}
 			}
 		}
+	}
+
+	public override void InterruptTask()
+	{
+		base.InterruptTask();
+
+		// Interrupt the question and add 2 more keys
+		if (question != null)
+			question = GenerateQuestion(question.Count + 3);
+		else
+			question = GenerateQuestion(3);
+		interruptTimer = 2.0f;
 	}
 
 	// Start is called before the first frame update
@@ -134,12 +163,16 @@ public class MeetingTask : TaskBase
 		{
 			HandleTimers();
 
-			// 
+			HandleQuestion();
 
-			if (questionAnswerTimer > 0)
-				HandleQuestion();
+			playerSpeakingOverlay.SetActive(interruptTimer > 0 || question.Count > 0);
 		}
     }
+
+	public override string CatInterruptMessage()
+	{
+		return "Cat interrupted your meeting";
+	}
 
 	public override string ToString()
 	{

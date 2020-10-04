@@ -69,12 +69,12 @@ public class ProgrammingTask : TaskBase
 	/// </summary>
 	/// <param name="length">The length of the code</param>
 	/// <returns>The list of code snippet IDs to show</returns>
-	private int[] GetSnippetOrder(int length)
+	public static int[] GetSnippetOrder(int length, int numCodeSnippets)
 	{
 		// We need to start with opening line, followed by the code body, followed by another curly bracket.
 		// The length for the code body will be length - 2
 		if (length < 3)
-			return GetRandomSnippets(length); //TODO: figure out something more elegant later
+			return GetRandomSnippets(length, numCodeSnippets); //TODO: figure out something more elegant later
 
 		// Create the snippet order and place in the 3 fixed snippets
 		int[] snippets = new int[length];
@@ -84,7 +84,7 @@ public class ProgrammingTask : TaskBase
 
 		// Place the code body in
 		for (int i = 2; i < length - 1; i++)
-			snippets[i] = Random.Range(2, codeSnippets.Length);
+			snippets[i] = Random.Range(2, numCodeSnippets);
 
 		return snippets;
 	}
@@ -94,12 +94,12 @@ public class ProgrammingTask : TaskBase
 	/// </summary>
 	/// <param name="length">The length of the code</param>
 	/// <returns>A list of random code snippets</returns>
-	private int[] GetRandomSnippets(int length)
+	public static int[] GetRandomSnippets(int length, int numCodeSnippets)
 	{
 		int[] snippets = new int[length];
 
 		for (int i = 0; i < length; i++)
-			snippets[i] = Random.Range(0, codeSnippets.Length);
+			snippets[i] = Random.Range(0, numCodeSnippets);
 
 		return snippets;
 	}
@@ -110,38 +110,41 @@ public class ProgrammingTask : TaskBase
 	/// <param name="key">The key press in the keys array</param>
 	private void TypeKey(int key)
 	{
-		if (cursor < keyOrder.Length)
+		if (keyOrder != null)
 		{
-			// Fetch the correct and incorrect code snippets here
-			GameObject correct = codeSnippets[correctSnippets[cursor]];
-			GameObject incorrect = codeSnippets[wrongSnippets[cursor]];
-
-			// Place code snippet at cursor and set its color
-			if (key == keyOrder[cursor])
+			if (cursor < keyOrder.Length)
 			{
-				typedSnippets[cursor] = Instantiate(correct);
-				typedSnippets[cursor].GetComponent<Image>().color = correctColor;
+				// Fetch the correct and incorrect code snippets here
+				GameObject correct = codeSnippets[correctSnippets[cursor]];
+				GameObject incorrect = codeSnippets[wrongSnippets[cursor]];
+
+				// Place code snippet at cursor and set its color
+				if (key == keyOrder[cursor])
+				{
+					typedSnippets[cursor] = Instantiate(correct);
+					typedSnippets[cursor].GetComponent<Image>().color = correctColor;
+				}
+				else
+				{
+					typedSnippets[cursor] = Instantiate(incorrect);
+					typedSnippets[cursor].GetComponent<Image>().color = incorrectColor;
+				}
+
+				// Parent it to the code root
+				typedSnippets[cursor].transform.SetParent(codeRoot);
+
+				// Reset the scale
+				typedSnippets[cursor].transform.localScale = Vector3.one;
+
+				// Position the snippet correctly
+				typedSnippets[cursor].transform.localPosition = new Vector2(codeStartPos.x + codePosStep.x * cursor, codeStartPos.y + codePosStep.y * cursor);
+
+				// Give it its name
+				typedSnippets[cursor].gameObject.name = cursor.ToString() + ":" + key.ToString();
+
+				// Move cursor
+				cursor++;
 			}
-			else
-			{
-				typedSnippets[cursor] = Instantiate(incorrect);
-				typedSnippets[cursor].GetComponent<Image>().color = incorrectColor;
-			}
-
-			// Parent it to the code root
-			typedSnippets[cursor].transform.SetParent(codeRoot);
-
-			// Reset the scale
-			typedSnippets[cursor].transform.localScale = Vector3.one;
-
-			// Position the snippet correctly
-			typedSnippets[cursor].transform.localPosition = new Vector2(codeStartPos.x, codeStartPos.y + codePosStep.y * cursor);
-
-			// Give it its name
-			typedSnippets[cursor].gameObject.name = cursor.ToString() + ":" + key.ToString();
-
-			// Move cursor
-			cursor++;
 		}
 	}
 
@@ -150,7 +153,7 @@ public class ProgrammingTask : TaskBase
 	/// </summary>
 	private void DeletePreviousLine()
 	{
-		if (cursor > 0)
+		if (cursor > 0 && typedSnippets != null)
 		{
 			// Move cursor backwards
 			cursor--;
@@ -169,14 +172,19 @@ public class ProgrammingTask : TaskBase
 		progress = 0;
 		MaxProgress = length;
 
+		// Remove code snippets
+		for (int i = 0; i < codeRoot.childCount; i++)
+			if (codeRoot.GetChild(i).name != "Key Image" && codeRoot.GetChild(i).name != "Cursor")
+				Destroy(codeRoot.GetChild(i).gameObject);
+
 		// Reset typing
 		cursor = 0;
 		typedSnippets = new GameObject[length];
 
 		// Create a list of key presses, correct snippets and incorrect snippets
 		keyOrder = CreateKeyOrder(length);
-		correctSnippets = GetSnippetOrder(length);
-		wrongSnippets = GetRandomSnippets(length);
+		correctSnippets = GetSnippetOrder(length, codeSnippets.Length);
+		wrongSnippets = GetRandomSnippets(length, codeSnippets.Length);
 	}
 
 	public override int End()
@@ -187,6 +195,8 @@ public class ProgrammingTask : TaskBase
 
 	public override void InterruptTask()
 	{
+		base.InterruptTask();
+
 		// Remove characters each time
 		DeletePreviousLine();
 	}
@@ -269,6 +279,11 @@ public class ProgrammingTask : TaskBase
 		}
 
 		ShowNextKey();
+	}
+
+	public override string CatInterruptMessage()
+	{
+		return "Cat pressed backspace";
 	}
 
 	public override string ToString()

@@ -27,17 +27,20 @@ public class CatController : MonoBehaviour
 	private float interruptMaxTime; // Time between interruptions. Decreases as hunger gets to 100
 	public Vector2 interruptTimeRange;
 
-	// The cat's animator
-	public Animator animator;
-
 	// Reference to the task manager
 	private TaskManager _taskManager;
 
 	[Header("AI")]
 	public Vector2 moveSpeed;
 
+	// The cat's animator
+	public Animator animator;
+
+	public Animator speechAnimator;
+
 	[Header("Sound")]
 	public AudioSource[] meows;
+	public AudioSource feedSound;
 
 	[Header("UI")]
 	public GameObject hungerBar;
@@ -70,6 +73,9 @@ public class CatController : MonoBehaviour
 
 		if (id < meows.Length)
 			meows[id].Play();
+
+		// Make the speech bubble appear over the cat
+		speechAnimator.SetTrigger("Meow");
 	}
 
 	private void ManageHunger()
@@ -127,7 +133,11 @@ public class CatController : MonoBehaviour
 	/// </summary>
 	public void Feed()
 	{
-		hunger = 0;
+		if (hunger > hungerThresholdInterrupting)
+		{
+			hunger = 0;
+			feedSound.Play();
+		}
 	}
 
     // Start is called before the first frame update
@@ -162,9 +172,9 @@ public class CatController : MonoBehaviour
 	}
 
 	// Disable collision with player
-	private void OnCollisionEnter(Collision collision)
+	private void OnCollisionEnter2D(Collision2D collision)
 	{
 		if (collision.gameObject.tag == "Player")
-			Physics.IgnoreCollision(collision.collider, GetComponent<Collider>());
+			Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
 	}
 }

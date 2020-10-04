@@ -86,13 +86,12 @@ public class TaskObject : MonoBehaviour
 		{
 			// Make sure these are set to false to prevent any weird behaviour
 			taskActivated = false;
-			highlighted = false;
 		}
 
 		// We want the player to be unable to move when doing a task
 		_player.canMove = !taskActivated;
 
-		highlightOverlay.SetActive(highlighted);
+		highlightOverlay.SetActive(highlighted && taskAvailable);
 
 		// Show/hide the task
 		taskUI.SetActive(taskActivated);

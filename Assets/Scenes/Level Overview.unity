@@ -414,7 +414,7 @@ GameObject:
   m_Component:
   - component: {fileID: 126690299}
   m_Layer: 0
-  m_Name: Into Screen
+  m_Name: Intro Screen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1764,7 +1764,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: You are a software engineer with a cat trying to work from home. Good luck.
+  m_Text: You are a programmer with a cat trying to work from home. Good luck.
 --- !u!222 &1967852243
 CanvasRenderer:
   m_ObjectHideFlags: 0

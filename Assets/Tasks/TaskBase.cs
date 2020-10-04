@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class TaskBase : MonoBehaviour
 {
@@ -19,6 +20,9 @@ public class TaskBase : MonoBehaviour
 	// Performance rating for the task (positive = increase performance, negative = decrease, 0 = no change)
 	public int performanceRating;
 
+	// The task object this is attached to
+	public TaskObject taskObject;
+
 	// Keys to press and their respective sprites
 	[Header("Keys")]
 	public List<KeyCode> keys; // the keys chosen
@@ -29,7 +33,11 @@ public class TaskBase : MonoBehaviour
 	private static KeyCode[] allKeys = { KeyCode.A, KeyCode.B, KeyCode.C, KeyCode.D, /*KeyCode.E,*/ KeyCode.F, KeyCode.G, KeyCode.H, KeyCode.I, KeyCode.J, KeyCode.K, KeyCode.L,
 		KeyCode.M, KeyCode.N, KeyCode.O, KeyCode.P, KeyCode.Q, KeyCode.R, KeyCode.S, KeyCode.T, KeyCode.U, KeyCode.V, KeyCode.W, KeyCode.X, KeyCode.Y, KeyCode.Z };
 
-	
+
+	[Header("UI")]
+	public Animator interruptMessage;
+	public Text interruptText;
+
 	public bool paused;
 	/// <summary>
 	/// Pauses/unpauses this task
@@ -82,7 +90,8 @@ public class TaskBase : MonoBehaviour
 	/// </summary>
 	public virtual void InterruptTask()
 	{
-		progress -= 1;
+		interruptMessage.SetTrigger("Show");
+		interruptText.text = CatInterruptMessage();
 	}
 
     // Start is called before the first frame update
@@ -101,6 +110,11 @@ public class TaskBase : MonoBehaviour
 	public override bool Equals(object other)
 	{
 		return other.GetType() == this.GetType();
+	}
+
+	public virtual string CatInterruptMessage()
+	{
+		return "Cat Interrupted";
 	}
 
 	public override string ToString()
