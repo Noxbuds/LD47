@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MenuHandler : MonoBehaviour
 {
 	public GameObject successScreen;
 	public GameObject failScreen;
-	public GameObject intoScreen;
+	public Text failMessage;
+	public GameObject introScreen;
 	public GameObject gameFinishScreen;
 
 	/// <summary>
@@ -25,7 +27,7 @@ public class MenuHandler : MonoBehaviour
 		// They are all disabled by default
 		if (PlayerData.OnMainMenu)
 		{
-			intoScreen.SetActive(true);
+			introScreen.SetActive(true);
 		}
 		else
 		{
@@ -42,6 +44,7 @@ public class MenuHandler : MonoBehaviour
 				else
 				{
 					failScreen.SetActive(true);
+					failMessage.text = "" + PlayerData.Level;
 				}
 			}
 		}

@@ -107,12 +107,17 @@ public class CatController : MonoBehaviour
 	// Makes the cat move towards the player
 	private void CatAI()
 	{
+		bool moving = _rigidbody.velocity.magnitude > 0.2f;
+
+		// If moving, update animator
+		animator.SetBool("IsWalking", moving);
+
 		// Move towards player if hunger is above threshold
 		if (hunger > hungerThresholdInterrupting)
 		{
 			Vector2 dirToPlayer = _player.transform.position - transform.position;
 
-			bool moving = _rigidbody.velocity.magnitude > 0.2f;
+			
 
 			// Start moving
 			if (dirToPlayer.sqrMagnitude > 3.5 && moving || dirToPlayer.sqrMagnitude > 4.5 && !moving)
@@ -123,8 +128,7 @@ public class CatController : MonoBehaviour
 			else
 				_rigidbody.velocity = Vector2.zero;
 
-			// If moving, update animator
-			animator.SetBool("IsWalking", moving);
+			
 		}
 	}
 
