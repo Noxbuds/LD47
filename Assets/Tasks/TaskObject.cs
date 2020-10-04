@@ -54,6 +54,9 @@ public class TaskObject : MonoBehaviour
 
 			_taskManager.CompleteTask();
 
+			// Hide the task
+			taskActivated = false;
+
 			// Update performance rating
 			FindObjectOfType<PerformanceTracker>().performanceRating += performanceChange;
 		}

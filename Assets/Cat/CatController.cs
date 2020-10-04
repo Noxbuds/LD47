@@ -43,6 +43,15 @@ public class CatController : MonoBehaviour
 	public GameObject hungerBar;
 	public float hungerBarSize;
 
+	/// <summary>
+	/// Returns whether the cat is hungry
+	/// </summary>
+	/// <returns></returns>
+	public bool IsHungry()
+	{
+		return hunger > hungerThresholdInterrupting;
+	}
+
 	// Adjusts the position and width of the hunger bar
 	private void UpdateHungerBar()
 	{
